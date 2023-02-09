@@ -2,10 +2,23 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from '@/styles/Home.module.css'
+import { useEffect, useState } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Products() {
+  const [products, setProducts] = useState([])
+
+  const getProducts = async () => {
+    const resp = await fetch('http://localhost:3000/api/products')
+    const data = await resp.json()
+    setProducts(data.products)
+  }
+
+  useEffect(() => {
+    getProducts()
+  }, [])
+
   return (
     <>
       <Head>
@@ -21,44 +34,22 @@ export default function Products() {
         </div>
 
         <div className={styles.grid}>
-          <div className={styles.card}>
-            <h2 className={inter.className}>
-              Produto 1
-            </h2>
-            <p className={inter.className}>
-              Descrição produto 1
-            </p>
-          </div>
-
-          <div className={styles.card}>
-            <h2 className={inter.className}>
-              Produto 2
-            </h2>
-            <p className={inter.className}>
-              Descrição produto 2
-            </p>
-          </div>
-
-          <div className={styles.card}>
-            <h2 className={inter.className}>
-              Produto 3
-            </h2>
-            <p className={inter.className}>
-              Descrição produto 3
-            </p>
-          </div>
-
-          <div className={styles.card}>
-            <h2 className={inter.className}>
-              Produto 4
-            </h2>
-            <p className={inter.className}>
-              Descrição produto 4
-            </p>
-          </div>
+          {products.map(product => {
+            return (
+              <div 
+                className={styles.card}
+                key={product.id}
+                >
+                <h2 className={inter.className}>
+                  {product.name}
+                </h2>
+                <p className={inter.className}>
+                  {product.description}
+                </p>
+              </div>
+            )
+          })}
         </div>
-
-        
       </main>
     </>
   )

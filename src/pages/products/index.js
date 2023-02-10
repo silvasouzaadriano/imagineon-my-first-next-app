@@ -6,19 +6,20 @@ import { useEffect, useState } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Products() {
-  const [products, setProducts] = useState([])
+export const getStaticProps = async () => {
+  const resp = await fetch('http://localhost:3000/api/products')
+  const data = await resp.json()
 
-  const getProducts = async () => {
-    const resp = await fetch('http://localhost:3000/api/products')
-    const data = await resp.json()
-    setProducts(data.products)
+  return {
+    revalidate: 10, // 10 segundos
+    props: {
+      products: data.products,
+      randomNumber: data.randomNumber
+    }
   }
+}
 
-  useEffect(() => {
-    getProducts()
-  }, [])
-
+const Products = props => {
   return (
     <>
       <Head>
@@ -30,11 +31,11 @@ export default function Products() {
 
       <main className={styles.main}>
         <div className={styles.cener}>
-            <p>PRODUTOS EM PROMOÇÃO</p>
+            <p>PRODUTOS EM PROMOÇÃO: {props.randomNumber}</p>
         </div>
 
         <div className={styles.grid}>
-          {products.map(product => {
+          {props.products.map(product => {
             return (
               <div 
                 className={styles.card}
@@ -54,3 +55,4 @@ export default function Products() {
     </>
   )
 }
+export default Products;
